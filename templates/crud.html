@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head></head>
+   <body>
+      <h3>
+         <a href = "{{ url_for('consulta') }}">Comentários - Exemplo com Flask SQLAlchemy</a>
+      </h3>
+      <hr/>
+      {%- for mensagem in get_flashed_messages() %}
+         {{ mensagem }}
+      {%- endfor %}
+      <h3>User (<a href = "{{ url_for('new') }}">Adicionar usuário</a>)</h3>
+      <table>
+         <thead>
+            <tr>
+               <th>Nome</th>
+               <th>Email</th>
+               <th>Telefone</th>
+               <th>Observacao</th>
+               <th>Ações</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% for user in users %}
+               <tr>
+                  <td>{{ estudante.nome }}</td>
+                  <td>{{ estudante.email }}</td>
+                  <td>{{ estudante.telefone }}</td>
+                  <td>{{ estudante.observacao }}</td>
+                  <td>
+                     <a href="/consulta/{{user.id}}">Consultar</a>
+                  </td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   </body>
+</html>
