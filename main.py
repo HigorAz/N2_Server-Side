@@ -28,7 +28,7 @@ def sort(vetor):
 def ordena():
     resultado = "" #Resultado recebe um valor sem valor para que consiga receber o valor do if e retornar fora do if
     if request.method == 'POST': #Verifica se recebeu um valor no form do html.
-        vetor_ordenacao = request.form["vetor"]
+        vetor_ordenacao = request.form["vetor"] #Entrada de dados do formulário em html
         if not vetor_ordenacao: #Se não recebeu, retorna erro
             flash("Nada digitado!", "Error")
         else: #Se receber, entra no algoritmo:
@@ -52,14 +52,14 @@ class Users(db.Model): #Declara classe do banco de dados
     telefone = db.Column(db.Integer) #Coluna de telefone como inteiro
     observacao = db.Column(db.String(100)) #Coluna de observação como string de 100 caracteres
 
-    # objeto
+    # Construtor que chama a classe
     def __init__(self, nome, email, telefone, observacao):
-        self.nome = nome
-        self.email = email
-        self.telefone = telefone
-        self.observacao = observacao
+        self.nome = nome #atribui o valor de nome para o atributo nome instanciado
+        self.email = email #atribui o valor de email para o atributo email instanciado
+        self.telefone = telefone #atribui o valor de telefone para o atributo telefone instanciado
+        self.observacao = observacao #atribui o valor de observacao para o atributo observacao instanciado
 
-    def to_dict(self):
+    def to_dict(self): # função to_dict para transformar os valores recebidos anteriormente em json
         return {
             'nome': self.nome,
             'email': self.email,
@@ -68,28 +68,27 @@ class Users(db.Model): #Declara classe do banco de dados
         }
 
 
-# lista todos os usuarios
+# Rota para consultar os usuários
 @app.route('/consulta')
 def consulta():
-
-    # for x in range(10000):
-    #     user = Users("nome " + str(x), "email " + str(x), "tel " + str(x), "obs " + str(x))
+    # for x in range(10000): #Laço de repetição para a criação de 10000 usuários
+    #     user = Users("nome " + str(x), "email " + str(x), "tel " + str(x), "obs " + str(x)) # define o usuários com nome, email, telefone e observação
     #     db.session.add(user)  # salva no banco
     # db.session.commit() # commit da operação
 
-    inicio = time.time()
+    inicio = time.time() #Inicia o temporizador
 
-    user = Users.query.all()
-    user_to_dict = []
-    for u in user:
-        user_to_dict.append(u.to_dict())
-    aux = ujson.dumps(user_to_dict)
+    user = Users.query.all() #Consulta e armazena os registros com SQLAlchemy
+    user_to_dict = [] #Inicia a lista vazia
+    for u in user: #Laço de repetição para transformar os usuários em json
+        user_to_dict.append(u.to_dict()) #Utiliza o to_dict para transformar os dados em json
+    aux = ujson.dumps(user_to_dict) #Converte a lista to_dict anterior em json
 
-    fim = time.time()
+    fim = time.time() #Finaliza o temporizador
 
-    tempo_total = ((fim-inicio)*1000)
-
-    return str(tempo_total) + '   ' + aux
+    tempo_total = ((fim-inicio)*1000) #Calcula o tempo total cronometrado
+    resultado = str(tempo_total) + '   ' + aux #Retorna o tempo total em string e o valor auxiliar em json
+    return render_template('crud.html', resultado=resultado) #Retorna o template em html com o resultado armazenado
 
 
 # Função Dijkstra para encontrar menor caminho no grafo
@@ -112,24 +111,26 @@ def dijkstra(grafo, begin):
 
 #Exemplo de grafo:
 #{"A": {"B": 5, "C": 3, "D": 2}, "B": {"A": 5, "C": 2, "E": 4}, "C": {"A": 3, "B": 2, "D": 1}, "D": {"A": 2, "C": 1, "E": 7}, "E": {"B": 4, "D": 7}}
+
+#Rota para a resolução do grafo
 @app.route('/grafo', methods=['GET', 'POST'])
 def grafo():
-    resultado = ""
-    if request.method == 'POST':
-        grafo_input = request.form["grafo"]
-        if not grafo_input:
+    resultado = "" #Resultado recebe um valor sem valor para que consiga receber o valor do if e retornar fora do if
+    if request.method == 'POST': #Verifica se recebeu um valor no form do html.
+        grafo_input = request.form["grafo"] #Entrada de dados através do formulário html
+        if not grafo_input: #Se não recebeu, retorna erro
             flash("Nada digitado!", "Error")
-        else:
-            grafo = ujson.loads(grafo_input)
-            inicio = time.time()
-            menorCaminho = dijkstra(grafo, "A")
-            fim = time.time()
+        else: #Se receber, entra no algoritmo:
+            grafo = ujson.loads(grafo_input) #Função para armazenar a string em json recebida em grafo_input e converter em uma estrutura python
+            inicio = time.time() # Inicia o cronometro
+            menorCaminho = dijkstra(grafo, "A") #Identifica o menor caminho utilizando a função de dijkstra utilizando o ponto A como start
+            fim = time.time() # Finaliza o cronometro
 
-            retorno = ujson.dumps(menorCaminho)
-            tempo_total = ((fim - inicio) * 1000)
-            flash(f"Tempo: {tempo_total}\n{retorno}", "Sucesso")
-            resultado = str(tempo_total) + '  ' + retorno
-    return render_template('grafo.html', resultado=resultado)
+            retorno = ujson.dumps(menorCaminho) # Converte e retorna o valor de menor caminho em json
+            tempo_total = ((fim - inicio) * 1000) #Calcula o tempo total do cronometro
+            flash(f"Tempo: {tempo_total}\n{retorno}", "Sucesso") #Retorno de mensagem de sucesso
+            resultado = str(tempo_total) + '  ' + retorno #Armazena o resultado do tempo total e do retorno em json do menor caminho
+    return render_template('grafo.html', resultado=resultado) #Retorna o template em html com o resultado armazenado anteriormente
 
 if __name__ == '__main__':
     app.app_context().push()  # recupera o contexto da aplicação que está usando o banco
