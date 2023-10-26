@@ -1,0 +1,7 @@
+Bibliotecas utilizadas para o desenvolvimento do projeto
+
+heapq
+time
+ujson
+Flask, render_template, request, flash
+SQLAlchemy
